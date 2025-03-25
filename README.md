@@ -13,7 +13,7 @@ Need not worry about setting everything from scratch.
 ```bash
 git clone --depth 1 https://github.com/BruceChanJianLe/cpp-project.git
 ```
-1. Populate `src` and `include` directory with your testing code.
+2. Populate `src` and `include` directory with your testing code.
 
 ## Building
 

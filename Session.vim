@@ -17,26 +17,19 @@ badd +112 src/mlp.cpp
 badd +34 include/nn/mlp.hpp
 badd +25 CMakeLists.txt
 badd +27 README.md
-badd +1 fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network//
-badd +1 src/logic_gate_or.cpp
+badd +3 src/logic_gate_or.cpp
 badd +1 ~/reference/cpp-project.git/worktrees/neural-network/COMMIT_EDITMSG
+badd +1 ~/reference/cpp-project.git/neural-network
 argglobal
 %argdel
-$argadd ./
+$argadd ~/reference/cpp-project.git/neural-network
 edit src/logic_gate_or.cpp
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
-split
-wincmd _ | wincmd |
-split
-2wincmd k
-wincmd _ | wincmd |
 vsplit
 1wincmd h
-wincmd w
-wincmd w
 wincmd w
 let &splitbelow = s:save_splitbelow
 let &splitright = s:save_splitright
@@ -47,7 +40,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-wincmd =
+exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
+exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
 argglobal
 balt README.md
 setlocal foldmethod=manual
@@ -60,7 +54,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 3 - ((2 * winheight(0) + 12) / 25)
+let s:l = 3 - ((2 * winheight(0) + 26) / 52)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -84,7 +78,7 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 11 - ((5 * winheight(0) + 12) / 25)
+let s:l = 11 - ((10 * winheight(0) + 26) / 52)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -92,54 +86,8 @@ keepjumps 11
 normal! 0
 lcd ~/reference/cpp-project.git/neural-network
 wincmd w
-argglobal
-if bufexists(fnamemodify("fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network//", ":p")) | buffer fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network// | else | edit fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network// | endif
-if &buftype ==# 'terminal'
-  silent file fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network//
-endif
-balt ~/reference/cpp-project.git/neural-network/README.md
-setlocal foldmethod=manual
-setlocal foldexpr=0
-setlocal foldmarker=<<<<<<<<,>>>>>>>>
-setlocal foldignore=#
-setlocal foldlevel=0
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-let s:l = 9 - ((8 * winheight(0) + 6) / 12)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 9
-normal! 0
-lcd ~/reference/cpp-project.git/neural-network
-wincmd w
-argglobal
-if bufexists(fnamemodify("~/reference/cpp-project.git/worktrees/neural-network/COMMIT_EDITMSG", ":p")) | buffer ~/reference/cpp-project.git/worktrees/neural-network/COMMIT_EDITMSG | else | edit ~/reference/cpp-project.git/worktrees/neural-network/COMMIT_EDITMSG | endif
-if &buftype ==# 'terminal'
-  silent file ~/reference/cpp-project.git/worktrees/neural-network/COMMIT_EDITMSG
-endif
-balt ~/reference/cpp-project.git/neural-network/README.md
-setlocal foldmethod=manual
-setlocal foldexpr=0
-setlocal foldmarker={{{,}}}
-setlocal foldignore=#
-setlocal foldlevel=0
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 6) / 13)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 1
-normal! 0
-lcd ~/reference/cpp-project.git/neural-network
-wincmd w
-4wincmd w
-wincmd =
+exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
+exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
@@ -154,6 +102,7 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
+nohlsearch
 let g:this_session = v:this_session
 let g:this_obsession = v:this_session
 doautoall SessionLoadPost

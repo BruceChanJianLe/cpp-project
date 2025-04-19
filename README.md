@@ -1,24 +1,20 @@
 ## Introduction
 
-This repository is a template or a starting point that is:
-- A CMake Project
-- Well structured project with examples
-- With standard compile flags
+Writing a fully connected neural network in C++.
+Currently, this project is only tested on Arch Linux.
 
-Need not worry about setting everything from scratch.
+## Dependencies
 
-## Usage
-
-1. Clone repo shallowly. You won't need the other branches!
 ```bash
-git clone --depth 1 https://github.com/BruceChanJianLe/cpp-project.git
+sudo pacman -S clang libc++
 ```
-2. Populate `src` and `include` directory with your testing code.
 
 ## Building
 
 Build using the `cmake` command.  
 ```bash
+export CC=clang
+export CXX=clang++
 cmake -S . -B build
 cmake --build build
 ```
@@ -27,5 +23,5 @@ cmake --build build
 
 Run the respective executable in the `build` directory.  
 ```bash
-./build/hello_world
+./build/logic_gate_or
 ```

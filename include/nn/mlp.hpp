@@ -4,19 +4,21 @@
 #include <vector>
 #include <random>
 #include <span>
-#include <mdspan>
+#include "experimental/__p0009_bits/mdspan.hpp"
 #include <ranges>
 #include <algorithm>
 #include <execution>
 #include <print>
+#include <ranges>
 
 namespace nn
 {
+  namespace stdex = std::experimental;
   struct Perceptron {
-    Perceptron(const std::size_t inputs, const double bias = 1.0);
+    Perceptron(const std::size_t _inputs, const double _bias = 1.0);
     double feed_forward(const std::span<const double> input);
     void set_weights(const std::span<const double> w_init);
-    double sigmoid(const double x);
+    double sigmoid(const double value);
     void print_weights();
 
     std::vector<double> weights;
@@ -24,9 +26,9 @@ namespace nn
   };
 
   struct MultiLayerPerceptron {
-    MultiLayerPerceptron(const std::vector<std::size_t>& layers, const double bias = 1.0, const double eta = 0.5);
+    MultiLayerPerceptron(const std::vector<std::size_t>& _layers, const double _bias = 1.0, const double _eta = 0.5);
     // void set_weights(const std::vector<std::vector<std::vector<double>>>& w_init);
-    void set_weights(const std::mdspan<const double, std::dextents<std::size_t, 3>> w_init);
+    void set_weights(const stdex::mdspan<const double, std::experimental::dextents<std::size_t, 3>> w_init);
     void print_weights();
 
     std::vector<double> feed_forward(std::vector<double> x);

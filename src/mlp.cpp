@@ -1,14 +1,18 @@
 #include "nn/mlp.hpp"
+#include <algorithm>
+#include <numeric>
+#include <ranges>
+#include <sstream>
 
 namespace nn
 {
-  Perceptron::Perceptron(const std::size_t input_size, const double bias)
-    : bias{bias}
+  Perceptron::Perceptron(const std::size_t _input_size, const double _bias)
+    : bias{_bias}
   {
     std::mt19937 gen(std::random_device{}());
     std::uniform_real_distribution<> dist(-1.0, 1.0);
 
-    weights.resize(input_size + 1);
+    weights.resize(_input_size + 1);
     std::generate(weights.begin(), weights.end(), [&gen, &dist](){ return dist(gen); });
   }
 
@@ -28,22 +32,22 @@ namespace nn
     std::ranges::copy(w_init.begin(), w_init.end(), weights.begin());
   }
 
-  double Perceptron::sigmoid(const double x)
+  double Perceptron::sigmoid(const double value)
   {
-    return 1.0 / (1.0 + std::exp(-x));
+    return 1.0 / (1.0 + std::exp(-value));
   }
 
   void Perceptron::print_weights()
   {
     for (const auto& weight : weights) {
-      std::print("{}, ", weight);
+      std::print("{:.2f}, ", weight);
     }
   }
 
-  MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<std::size_t>& layers, const double bias, const double eta)
-    : layers{layers}
-    , bias{bias}
-    , eta{eta}
+  MultiLayerPerceptron::MultiLayerPerceptron(const std::vector<std::size_t>& _layers, const double _bias, const double _eta)
+    : layers{_layers}
+    , bias{_bias}
+    , eta{_eta}
   {
     for (auto i = 0uz; i < layers.size(); ++i) {
       // Store for locality
@@ -83,20 +87,45 @@ namespace nn
   // columns for accessing the weights
 
   // Set weights for [depth][rows][cols], excluding the input layer
-  void MultiLayerPerceptron::set_weights(const std::mdspan<const double, std::dextents<std::size_t, 3>> w_init)
+  void MultiLayerPerceptron::set_weights(const stdex::mdspan<const double, stdex::dextents<std::size_t, 3>> w_init)
   {
-    for (auto i = 0uz; i != w_init.extent(0); ++i) {
-      for (auto j = 0uz; j != w_init.extent(1); ++j) {
-        auto data = &w_init[i, j, 0];
-        std::span curr_weigths{data, w_init.extent(2)};
-        network[i][j].set_weights(curr_weigths);
-      }
-    }
+    auto indexes = std::views::cartesian_product(
+        std::views::iota(0uz, w_init.extent(0)),
+        std::views::iota(0uz, w_init.extent(1))
+      );
+
+    std::for_each(std::execution::par_unseq,
+        indexes.begin(), indexes.end(),
+        [this,&w_init](auto index) {
+          auto& [i, j] = index;
+          // Break into smaller steps for future ref
+          auto data = &w_init[i, j, 0];
+          std::span curr_weigths{data, w_init.extent(2)};
+          network[i][j].set_weights(curr_weigths);
+        }
+      );
+    // for (auto i = 0uz; i != w_init.extent(0); ++i) {
+    //   for (auto j = 0uz; j != w_init.extent(1); ++j) {
+    //   }
+    // }
   }
 
   void MultiLayerPerceptron::print_weights()
   {
-    ;
+    auto indexes = std::views::iota(1uz, network.size());
+    std::for_each(indexes.begin(), indexes.end(),
+        [this](auto index) {
+          std::println("Layer {}", index);
+          for (auto i = 0uz; i < layers[index]; ++i) {
+            std::stringstream ss;
+            for (const auto& weight : network[index][i].weights) {
+              ss << std::format("{:.2f}", weight) << ", ";
+            }
+            std::println("Neuron {}: weights = [{}]", i, ss.str());
+          }
+          return;
+        }
+      );
   }
 
   std::vector<double> MultiLayerPerceptron::feed_forward(std::vector<double> x)

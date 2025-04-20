@@ -56,3 +56,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(logic_gate_or PUBLIC -stdlib=libc++ -fexperimental-library)
   target_link_options(logic_gate_or PUBLIC -stdlib=libc++ -fexperimental-library)
 endif()
+
+# logic gate xor
+add_executable(logic_gate_xor ./src/logic_gate_xor.cpp ./src/mlp.cpp)
+target_include_directories(logic_gate_xor PUBLIC include)
+target_link_libraries(logic_gate_xor PRIVATE TBB::tbb std::mdspan Kokkos::kokkos)

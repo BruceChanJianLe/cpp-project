@@ -1,8 +1,6 @@
 #include "nn/mlp.hpp"
 #include <algorithm>
-#include <numeric>
 #include <ranges>
-#include <sstream>
 
 namespace nn
 {
@@ -49,10 +47,11 @@ namespace nn
     , bias{_bias}
     , eta{_eta}
   {
+    // Potential spot to be paralleled
     for (auto i = 0uz; i < layers.size(); ++i) {
       // Store for locality
       auto curr_nn_size = layers[i];
-      auto prev_nn_size = i ? layers[i] : layers[i - 1];
+      auto prev_nn_size = i ? layers[i - 1] : layers[i];
 
       // Create perceptrons for current layer
       std::vector<Perceptron> perceptrons;
@@ -63,10 +62,12 @@ namespace nn
         for (auto j = 0uz; j < curr_nn_size; ++j) {
           network[i].emplace_back(Perceptron{prev_nn_size, bias});
         }
+      }
 
       // Create place holder for feed forward result
       feed_forward_results.emplace_back(curr_nn_size, 0.0);
-      }
+      // Create place holder where delta errors are store
+      delta_errors.emplace_back(curr_nn_size, 0.0);
     }
   }
 
@@ -95,47 +96,141 @@ namespace nn
       );
 
     std::for_each(std::execution::par_unseq,
-        indexes.begin(), indexes.end(),
-        [this,&w_init](auto index) {
-          auto& [i, j] = index;
-          // Break into smaller steps for future ref
-          auto data = &w_init[i, j, 0];
-          std::span curr_weigths{data, w_init.extent(2)};
-          network[i][j].set_weights(curr_weigths);
-        }
-      );
-    // for (auto i = 0uz; i != w_init.extent(0); ++i) {
-    //   for (auto j = 0uz; j != w_init.extent(1); ++j) {
-    //   }
-    // }
+      indexes.begin(), indexes.end(),
+      [this,&w_init](const auto index) {
+        auto& [i, j] = index;
+        // Break into smaller steps for future ref
+        auto data = &w_init[i, j, 0];
+        std::span curr_weigths{data, w_init.extent(2)};
+        network[i][j].set_weights(curr_weigths);
+      }
+    );
+  }
+
+  void MultiLayerPerceptron::set_weights(const std::vector<std::vector<std::vector<double>>>& w_init)
+  {
+    for (auto i = 0uz; i < w_init.size(); i++) {
+      for (auto j = 0uz; j < w_init[i].size(); j++) {
+        network[i + 1][j].set_weights(w_init[i][j]);
+      }
+    }
   }
 
   void MultiLayerPerceptron::print_weights()
   {
     auto indexes = std::views::iota(1uz, network.size());
     std::for_each(indexes.begin(), indexes.end(),
-        [this](auto index) {
-          std::println("Layer {}", index);
-          for (auto i = 0uz; i < layers[index]; ++i) {
-            std::stringstream ss;
-            for (const auto& weight : network[index][i].weights) {
-              ss << std::format("{:.2f}", weight) << ", ";
-            }
-            std::println("Neuron {}: weights = [{}]", i, ss.str());
+      [this](const auto index) {
+        std::println("Layer {}", index);
+        for (auto i = 0uz; i < layers[index]; ++i) {
+          std::stringstream ss;
+          for (const auto& weight : network[index][i].weights) {
+            ss << std::format("{:.2f}", weight) << ", ";
           }
-          return;
+          std::println("Neuron {}: weights = [ {}]", i, ss.str());
         }
-      );
+        return;
+      }
+    );
   }
 
-  std::vector<double> MultiLayerPerceptron::feed_forward(std::vector<double> x)
+  std::vector<double> MultiLayerPerceptron::feed_forward(const std::span<const double> input)
   {
-    return {x};
+    // Copy over input input feed_forward_results 
+    // and use it as input to first hidden layer
+    std::ranges::copy(input.begin(), input.end(), feed_forward_results.front().begin());
+
+    auto indexes = std::views::iota(1uz, network.size());
+    std::for_each(std::execution::seq,
+      indexes.begin(), indexes.end(),
+      [this](const auto index) {
+        for (auto i = 0uz; i < layers[index]; ++i) {
+          feed_forward_results[index][i] = network[index][i].feed_forward(feed_forward_results[index - 1]);
+        }
+      }
+    );
+    return feed_forward_results.back();
   }
 
-  double MultiLayerPerceptron::back_propagate(std::vector<double> x, std::vector<double> y)
+  double MultiLayerPerceptron::back_propagate(const std::span<const double> input,const std::span<const double> ground_truth)
   {
-    return x.front() * y.front();
+    // Backpropagation:
+
+    // Step 1: Compute feed forward result
+    auto outputs = feed_forward(input);
+
+    // Step 2: Calculate MSE
+    if (outputs.size() != ground_truth.size()) {
+      std::println("Mismatch in size of feed forward results and labels!");
+      return -9999.9999;
+    }
+
+    auto indexes = std::views::iota(0uz, outputs.size());
+    std::vector<double> error(indexes.size());
+    double mse = std::transform_reduce(std::execution::par_unseq,
+      indexes.begin(), indexes.end(),
+      error.begin(), 0.0,
+      std::plus<>(),
+      [&outputs, &ground_truth](auto index, auto err) {
+        err = outputs[index] - ground_truth[index];
+        return err * err;
+      }
+    );
+
+    // Step 3: Calculate error term (output neuron)
+    std::for_each(std::execution::par_unseq,
+      indexes.begin(), indexes.end(),
+      [this, &outputs, &error](const auto index) {
+        delta_errors.back()[index] =
+          outputs[index] * (1 - outputs[index]) * error[index];
+      }
+    );
+
+    // Step 4: Calculate error term (hidden layer)
+    auto reverse_indexes = indexes
+      | std::views::take(indexes.size() - 1) // take away the last layer
+      | std::views::reverse;
+
+    std::for_each(std::execution::seq,
+      reverse_indexes.begin(), reverse_indexes.end(),
+      [this](const auto index) {
+        for (auto h = 0uz; h < network[index].size(); ++h) {
+          double ff_error{0.0};
+          for (auto k = 0uz; k < layers[index + 1]; ++k) {
+            ff_error +=
+              network[index + 1][k].weights[h] * delta_errors[index + 1][k];
+          }
+          delta_errors[index][h] =
+            feed_forward_results[index][h] * (1 - feed_forward_results[index][h]) * ff_error;
+        }
+      }
+    );
+
+    // Step 5 & 6: Apply delta rule to update weights
+    for (auto i = 1uz; i < network.size(); ++i) {
+      for (auto j = 0uz; j < layers[i]; ++j) {
+        for (auto k = 0uz; k < layers[i - 1] + 1; ++k) {
+          if (k == layers[i - 1]) {
+            network[i][j].weights[k] += eta * delta_errors[i][j] *bias;
+          } else {
+            network[i][j].weights[k] += eta * delta_errors[i][j] * feed_forward_results[i - 1][k];
+          }
+        }
+      }
+    }
+
+    return mse / static_cast<double>(layers.back());
   }
 
+  std::vector<double> flatten_3d(const std::vector<std::vector<std::vector<double>>>& nested) {
+    std::vector<double> flat(nested.size() * nested.front().size() * nested.front().front().size());
+    for (const auto& mat : nested) {
+      for (const auto& row : mat) {
+        for (const auto& val : row) {
+          flat.push_back(val);
+        }
+      }
+    }
+    return flat;
+  }
 } // nn

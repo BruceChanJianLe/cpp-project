@@ -13,17 +13,15 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +112 src/mlp.cpp
-badd +34 include/nn/mlp.hpp
-badd +25 CMakeLists.txt
+badd +153 src/mlp.cpp
+badd +30 include/nn/mlp.hpp
 badd +27 README.md
-badd +3 src/logic_gate_or.cpp
-badd +1 ~/reference/cpp-project.git/worktrees/neural-network/COMMIT_EDITMSG
-badd +1 ~/reference/cpp-project.git/neural-network
+badd +4 src/logic_gate_or.cpp
+badd +19 src/logic_gate_xor.cpp
 argglobal
 %argdel
-$argadd ~/reference/cpp-project.git/neural-network
-edit src/logic_gate_or.cpp
+$argadd ~/reference/cpp-project.git/neural-network/
+edit src/logic_gate_xor.cpp
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -43,7 +41,6 @@ set winwidth=1
 exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
 exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
 argglobal
-balt README.md
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -54,20 +51,20 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 3 - ((2 * winheight(0) + 26) / 52)
+let s:l = 13 - ((10 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 3
-normal! 0
+keepjumps 13
+normal! 027|
 lcd ~/reference/cpp-project.git/neural-network
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/reference/cpp-project.git/neural-network/include/nn/mlp.hpp", ":p")) | buffer ~/reference/cpp-project.git/neural-network/include/nn/mlp.hpp | else | edit ~/reference/cpp-project.git/neural-network/include/nn/mlp.hpp | endif
+if bufexists(fnamemodify("~/reference/cpp-project.git/neural-network/src/mlp.cpp", ":p")) | buffer ~/reference/cpp-project.git/neural-network/src/mlp.cpp | else | edit ~/reference/cpp-project.git/neural-network/src/mlp.cpp | endif
 if &buftype ==# 'terminal'
-  silent file ~/reference/cpp-project.git/neural-network/include/nn/mlp.hpp
+  silent file ~/reference/cpp-project.git/neural-network/src/mlp.cpp
 endif
-balt ~/reference/cpp-project.git/neural-network/src/mlp.cpp
+balt ~/reference/cpp-project.git/neural-network/include/nn/mlp.hpp
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -78,12 +75,12 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 11 - ((10 * winheight(0) + 26) / 52)
+let s:l = 152 - ((12 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 11
-normal! 0
+keepjumps 152
+normal! 036|
 lcd ~/reference/cpp-project.git/neural-network
 wincmd w
 exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
@@ -102,7 +99,6 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
-nohlsearch
 let g:this_session = v:this_session
 let g:this_obsession = v:this_session
 doautoall SessionLoadPost

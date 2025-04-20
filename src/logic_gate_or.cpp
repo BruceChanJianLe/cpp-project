@@ -3,7 +3,8 @@
 #include <print>
 #include "nn/mlp.hpp"
 
-int main() {
+int main ([[maybe_unused]] int argc, [[maybe_unused]]  char *argv[]) {
+
   std::print("---------------- LOGIC GATE (OR) ----------------\n\n");
 
   nn::Perceptron p(2);

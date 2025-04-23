@@ -13,21 +13,26 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +153 src/mlp.cpp
-badd +30 include/nn/mlp.hpp
+badd +152 src/mlp.cpp
+badd +19 include/nn/mlp.hpp
 badd +27 README.md
-badd +4 src/logic_gate_or.cpp
-badd +19 src/logic_gate_xor.cpp
+badd +21 src/logic_gate_xor.cpp
+badd +53 CMakeLists.txt
+badd +0 fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network//
 argglobal
 %argdel
 $argadd ~/reference/cpp-project.git/neural-network/
-edit src/logic_gate_xor.cpp
+edit include/nn/mlp.hpp
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
+split
+1wincmd k
+wincmd _ | wincmd |
 vsplit
 1wincmd h
+wincmd w
 wincmd w
 let &splitbelow = s:save_splitbelow
 let &splitright = s:save_splitright
@@ -38,9 +43,13 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
-exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
+exe '1resize ' . ((&lines * 26 + 28) / 57)
+exe 'vert 1resize ' . ((&columns * 85 + 102) / 205)
+exe '2resize ' . ((&lines * 26 + 28) / 57)
+exe 'vert 2resize ' . ((&columns * 119 + 102) / 205)
+exe '3resize ' . ((&lines * 27 + 28) / 57)
 argglobal
+balt README.md
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -51,20 +60,19 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 13 - ((10 * winheight(0) + 11) / 22)
+let s:l = 52 - ((24 * winheight(0) + 13) / 26)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 13
-normal! 027|
+keepjumps 52
+normal! 0
 lcd ~/reference/cpp-project.git/neural-network
 wincmd w
 argglobal
-if bufexists(fnamemodify("~/reference/cpp-project.git/neural-network/src/mlp.cpp", ":p")) | buffer ~/reference/cpp-project.git/neural-network/src/mlp.cpp | else | edit ~/reference/cpp-project.git/neural-network/src/mlp.cpp | endif
+if bufexists(fnamemodify("~/reference/cpp-project.git/neural-network/CMakeLists.txt", ":p")) | buffer ~/reference/cpp-project.git/neural-network/CMakeLists.txt | else | edit ~/reference/cpp-project.git/neural-network/CMakeLists.txt | endif
 if &buftype ==# 'terminal'
-  silent file ~/reference/cpp-project.git/neural-network/src/mlp.cpp
+  silent file ~/reference/cpp-project.git/neural-network/CMakeLists.txt
 endif
-balt ~/reference/cpp-project.git/neural-network/include/nn/mlp.hpp
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -75,16 +83,42 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 152 - ((12 * winheight(0) + 11) / 22)
+let s:l = 2 - ((0 * winheight(0) + 13) / 26)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 152
-normal! 036|
+keepjumps 2
+normal! 0
 lcd ~/reference/cpp-project.git/neural-network
 wincmd w
-exe 'vert 1resize ' . ((&columns * 95 + 95) / 191)
-exe 'vert 2resize ' . ((&columns * 95 + 95) / 191)
+argglobal
+if bufexists(fnamemodify("fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network//", ":p")) | buffer fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network// | else | edit fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network// | endif
+if &buftype ==# 'terminal'
+  silent file fugitive:///home/chanjl/reference/cpp-project.git/worktrees/neural-network//
+endif
+balt ~/reference/cpp-project.git/neural-network/README.md
+setlocal foldmethod=manual
+setlocal foldexpr=0
+setlocal foldmarker=<<<<<<<<,>>>>>>>>
+setlocal foldignore=#
+setlocal foldlevel=0
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 9 - ((8 * winheight(0) + 13) / 27)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 9
+normal! 0
+lcd ~/reference/cpp-project.git/neural-network
+wincmd w
+3wincmd w
+exe '1resize ' . ((&lines * 26 + 28) / 57)
+exe 'vert 1resize ' . ((&columns * 85 + 102) / 205)
+exe '2resize ' . ((&lines * 26 + 28) / 57)
+exe 'vert 2resize ' . ((&columns * 119 + 102) / 205)
+exe '3resize ' . ((&lines * 27 + 28) / 57)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
@@ -99,6 +133,7 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
+nohlsearch
 let g:this_session = v:this_session
 let g:this_obsession = v:this_session
 doautoall SessionLoadPost

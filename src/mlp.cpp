@@ -47,7 +47,6 @@ namespace nn
     , bias{_bias}
     , eta{_eta}
   {
-    // Potential spot to be paralleled
     for (auto i = 0uz; i < layers.size(); ++i) {
       // Store for locality
       auto curr_nn_size = layers[i];
@@ -122,6 +121,7 @@ namespace nn
     std::for_each(indexes.begin(), indexes.end(),
       [this](const auto index) {
         std::println("Layer {}", index);
+        std::println("========", index);
         for (auto i = 0uz; i < layers[index]; ++i) {
           std::stringstream ss;
           for (const auto& weight : network[index][i].weights) {
@@ -171,8 +171,8 @@ namespace nn
       indexes.begin(), indexes.end(),
       error.begin(), 0.0,
       std::plus<>(),
-      [&outputs, &ground_truth](auto index, auto err) {
-        err = outputs[index] - ground_truth[index];
+      [&outputs, &ground_truth](auto index, auto& err) {
+        err = ground_truth[index] - outputs[index];
         return err * err;
       }
     );
@@ -187,11 +187,11 @@ namespace nn
     );
 
     // Step 4: Calculate error term (hidden layer)
-    auto reverse_indexes = indexes
-      | std::views::take(indexes.size() - 1) // take away the last layer
-      | std::views::reverse;
+    auto reverse_indexes = std::views::iota(0uz, network.size())
+      | std::views::take(network.size() - 1) // take away the last layer
+      | std::views::reverse; // reverse from back to front
 
-    std::for_each(std::execution::seq,
+    std::for_each(std::execution::par_unseq,
       reverse_indexes.begin(), reverse_indexes.end(),
       [this](const auto index) {
         for (auto h = 0uz; h < network[index].size(); ++h) {
@@ -211,7 +211,7 @@ namespace nn
       for (auto j = 0uz; j < layers[i]; ++j) {
         for (auto k = 0uz; k < layers[i - 1] + 1; ++k) {
           if (k == layers[i - 1]) {
-            network[i][j].weights[k] += eta * delta_errors[i][j] *bias;
+            network[i][j].weights[k] += eta * delta_errors[i][j] * bias;
           } else {
             network[i][j].weights[k] += eta * delta_errors[i][j] * feed_forward_results[i - 1][k];
           }

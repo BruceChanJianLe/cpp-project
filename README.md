@@ -10,6 +10,15 @@ by Jonathan Gopel at CppCon 2022. Definitely checkout the talk if you have time.
 1. It is not possible to know the device's connection information before we
    join the network - we must find it in situ
 
+## Design
+
+1. Device detection
+    - Easiest to find all devices of a single type at once
+    - One scan per device type
+1. Device state monitoring
+    - Need to allow each device type to have different communication mechanism
+    - Want to update state only on-command to avoid network overhead
+
 ## Usage
 
 1. Clone repo shallowly. You won't need the other branches!
@@ -32,3 +41,7 @@ Run the respective executable in the `build` directory.
 ./build/device_virtual
 ./build/device_concept
 ```
+
+## Reference
+
+- https://github.com/CppCon/CppCon2022/blob/main/Presentations/Using-Modern-C-to-Eliminate-Virtual-Functions-Jonathan-Gopel-CppCon-2022.pdf

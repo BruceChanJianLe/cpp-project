@@ -13,7 +13,7 @@ namespace dv
   [[nodiscard]] auto Dimmer::find_in_env() -> device_list_t
   {
     device_list_t devices;
-    // Imagine we "discover" three switches in the environment
+    // Imagine we "discover" two dimmers in the environment
     static constexpr int num_switches = 2;
 
     std::string device_name{"Dimmer"};

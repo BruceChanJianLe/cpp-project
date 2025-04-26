@@ -30,3 +30,12 @@ add_executable(device_virtual
 )
 target_include_directories(device_virtual PUBLIC include)
 target_link_libraries(device_virtual fmt::fmt TBB::tbb)
+
+# Device concept
+add_executable(device_concept
+  ./src/device_concept.cpp
+  ./src/concept/switch.cpp
+  ./src/concept/dimmer.cpp
+)
+target_include_directories(device_concept PUBLIC include)
+target_link_libraries(device_concept fmt::fmt TBB::tbb)

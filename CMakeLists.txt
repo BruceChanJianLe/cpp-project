@@ -20,7 +20,13 @@ endif()
 find_package(fmt REQUIRED)
 find_package(TBB REQUIRED)
 
-# hello world example
-add_executable(hello_world ./src/hello_world.cpp)
-target_include_directories(hello_world PUBLIC include)
-target_link_libraries(hello_world fmt::fmt TBB::tbb)
+# Device virtual
+add_executable(device_virtual
+  ./src/device_virtual.cpp
+  ./src/virtual/devices.cpp
+  ./src/virtual/switch.cpp
+  ./src/virtual/dimmer.cpp
+  ./src/virtual/device_manager.cpp
+)
+target_include_directories(device_virtual PUBLIC include)
+target_link_libraries(device_virtual fmt::fmt TBB::tbb)

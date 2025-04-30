@@ -24,3 +24,13 @@ find_package(TBB REQUIRED)
 add_executable(hello_world ./src/hello_world.cpp)
 target_include_directories(hello_world PUBLIC include)
 target_link_libraries(hello_world fmt::fmt TBB::tbb)
+
+# compile time fibonacci numbers (std::size_t version)
+add_executable(fibonacci_example ./src/fibonacci_example.cpp)
+target_include_directories(fibonacci_example PUBLIC include)
+target_link_libraries(fibonacci_example fmt::fmt TBB::tbb)
+
+# compile time fibonacci numbers (int version)
+add_executable(fibonacci_example_int ./src/fibonacci_example_int.cpp)
+target_include_directories(fibonacci_example_int PUBLIC include)
+target_link_libraries(fibonacci_example_int fmt::fmt TBB::tbb)

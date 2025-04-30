@@ -1,19 +1,13 @@
 ## Introduction
 
-This repository is a template or a starting point that is:
-- A CMake Project
-- Well structured project with examples
-- With standard compile flags
-
-Need not worry about setting everything from scratch.
+A compile time fibonacci generator.
 
 ## Usage
 
 1. Clone repo shallowly. You won't need the other branches!
 ```bash
-git clone --depth 1 https://github.com/BruceChanJianLe/cpp-project.git
+git clone --depth 1 https://github.com/BruceChanJianLe/cpp-project.git -b compile_time_fibonacci
 ```
-2. Populate `src` and `include` directory with your testing code.
 
 ## Building
 
@@ -27,5 +21,8 @@ cmake --build build
 
 Run the respective executable in the `build` directory.  
 ```bash
-./build/hello_world
+# std::size_t version
+./build/fibonacci_example
+# int version
+./build/fibonacci_example_int
 ```

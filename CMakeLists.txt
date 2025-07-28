@@ -24,3 +24,8 @@ find_package(TBB REQUIRED)
 add_executable(hello_world ./src/hello_world.cpp)
 target_include_directories(hello_world PUBLIC include)
 target_link_libraries(hello_world fmt::fmt TBB::tbb)
+
+# about_inheritance
+add_executable(about_inheritance)
+target_sources(about_inheritance PRIVATE ./src/about_inheritance.cpp)
+target_link_libraries(about_inheritance fmt::fmt TBB::tbb)

@@ -1,8 +1,7 @@
 #include <cstdint>
 #include <print>
 
-class PluginBase
-{
+class PluginBase {
 public:
   PluginBase() : enable_{true} {}
   bool enable_;
@@ -12,15 +11,19 @@ public:
   bool get_status() { return enable_; }
 };
 
-class PluginOne : public PluginBase
-{
+class PluginOne : public PluginBase {
 public:
   const bool& get_local() const { return enable_; };
   const bool& get_base() const { return PluginBase::enable_; };
 };
 
-int main ()
-{
+class PluginTwo : public PluginBase {
+public:
+  const bool& get_local() const { return enable_; };
+  const bool& get_base() const { return PluginBase::enable_; };
+};
+
+int main () {
   PluginBase pb;
   std::println("PluginBase current status: {}", pb.get_status());
 
@@ -39,9 +42,16 @@ int main ()
   one.enable_plugin();
   std::println("PluginOne enable plugin: {}", one.get_status());
 
-  std::println("local and base are {}",
+  std::println();
+
+  std::println("local and base flags are {}",
       (reinterpret_cast<uintptr_t>(&one.get_local())
        == reinterpret_cast<uintptr_t>(&one.get_base())) ? "SAME" : "DIFF");
+
+  PluginTwo two;
+  std::println("one and two flags are {}",
+      (reinterpret_cast<uintptr_t>(&one.get_local())
+       == reinterpret_cast<uintptr_t>(&two.get_local())) ? "SAME" : "DIFF");
 
   return 0;
 }

@@ -24,3 +24,8 @@ find_package(TBB REQUIRED)
 add_executable(hello_world ./src/hello_world.cpp)
 target_include_directories(hello_world PUBLIC include)
 target_link_libraries(hello_world fmt::fmt TBB::tbb)
+
+# sso
+add_executable(sso_test ./src/sso_test.cpp)
+target_include_directories(sso_test PUBLIC include)
+target_link_libraries(sso_test fmt::fmt TBB::tbb)

@@ -20,7 +20,7 @@ endif()
 find_package(fmt REQUIRED)
 find_package(TBB REQUIRED)
 
-# hello world example
-add_executable(hello_world ./src/hello_world.cpp)
-target_include_directories(hello_world PUBLIC include)
-target_link_libraries(hello_world fmt::fmt TBB::tbb)
+# Almost correct leak detector
+add_executable(almost_correct_leak_detector ./src/almost_correct_leak_detector.cpp)
+target_include_directories(almost_correct_leak_detector PUBLIC include)
+target_link_libraries(almost_correct_leak_detector fmt::fmt TBB::tbb)

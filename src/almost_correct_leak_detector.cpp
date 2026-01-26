@@ -39,7 +39,7 @@ void operator delete[](void*, std::size_t) noexcept;
 #include <iostream>
 
 void *operator new(std::size_t n) {
-  std::cout << "Size of allocation: " << n + sizeof n << std::endl;
+  // std::cout << "Size of allocation: " << n + sizeof n << std::endl;
   void *p = std::malloc(n + sizeof n);
 
   if (!p) throw std::bad_alloc{};
@@ -51,7 +51,7 @@ void *operator new(std::size_t n) {
 }
 
 void *operator new[](std::size_t n) {
-  std::cout << "n: " << n << ", sizeof n: " << sizeof n << std::endl;
+  // std::cout << "n: " << n << ", sizeof n: " << sizeof n << std::endl;
   // std::cout << "Size of allocation[]: " << n + sizeof n << std::endl;
   void *p = std::malloc(n + sizeof n);
 

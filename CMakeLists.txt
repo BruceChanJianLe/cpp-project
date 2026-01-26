@@ -24,3 +24,13 @@ find_package(TBB REQUIRED)
 add_executable(almost_correct_leak_detector ./src/almost_correct_leak_detector.cpp)
 target_include_directories(almost_correct_leak_detector PUBLIC include)
 target_link_libraries(almost_correct_leak_detector fmt::fmt TBB::tbb)
+
+# Correct leak detector
+add_executable(leak_detector ./src/leak_detector.cpp)
+target_include_directories(leak_detector PUBLIC include)
+target_link_libraries(leak_detector fmt::fmt TBB::tbb)
+
+# Correct leak detector (better)
+add_executable(leak_detector_better ./src/leak_detector_better.cpp)
+target_include_directories(leak_detector_better PUBLIC include)
+target_link_libraries(leak_detector_better fmt::fmt TBB::tbb)
